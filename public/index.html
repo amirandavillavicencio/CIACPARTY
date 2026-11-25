@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MUSHROOM PARTY CIAC — N64 PANTALLA PRINCIPAL</title>
+  <link rel="stylesheet" href="/retro.css" />
+</head>
+<body>
+  <div id="stage-container">
+    <!-- Escenario 3D Nintendo 64 con modelos HBINMODE y texturas CI4 originales de Mario Party (USA).z64 -->
+    <canvas id="n64-canvas"></canvas>
+
+    <!-- HUD Superior: Identidad + Tablero de Pregunta (15 preguntas) + Escalímetro de Alturas -->
+    <div id="hud-top">
+      <div id="brand-panel" class="n64-box">
+        <h1 class="n64-title">MUSHROOM PARTY CIAC</h1>
+        <div class="top-badges">
+          <span id="rom-badge">ROM N64: IROIRO KINOKO</span>
+          <button id="btn-audio" class="n64-btn n64-btn-blue" style="font-size:10px; padding:2px 6px;">
+            SFX: ON
+          </button>
+        </div>
+        <div class="rules-list n64-text-outline">
+          • ACIERTO: HONGO SUBE (+1m)<br/>
+          • ERROR: HONGO BAJA (-1m)<br/>
+          • NINGÚN EQUIPO ES ELIMINADO<br/>
+          • GANA LA MAYOR ALTURA (15 PREG.)
+        </div>
+        <div style="margin-top:6px; display:flex; gap:4px;">
+          <button id="btn-cam-mode" class="n64-btn n64-btn-gray" style="font-size:10px; padding:3px 6px; width:100%;">
+            CÁMARA: PANORÁMICA N64
+          </button>
+        </div>
+      </div>
+
+      <div id="question-hud" class="n64-box-wood">
+        <div id="question-header-row">
+          <span id="question-counter" class="n64-text-outline">PREGUNTA 01 / 15</span>
+          <div id="progress-blocks" title="Progreso de las 15 preguntas"></div>
+          <div id="timer-box" title="Cuenta regresiva">
+            <span>TIEMPO:</span>
+            <span id="timer-seconds">--s</span>
+          </div>
+          <span id="phase-pill">SALA DE ESPERA</span>
+        </div>
+
+        <div id="question-prompt" class="n64-text-outline">
+          ESPERANDO QUE EL ANFITRIÓN INICIE LA PARTIDA...
+        </div>
+
+        <div id="options-grid">
+          <div class="hud-option" id="hud-opt-A">
+            <span class="opt-badge opt-A">A</span>
+            <span class="opt-text n64-text-outline" id="opt-text-A">OPCIÓN A</span>
+          </div>
+          <div class="hud-option" id="hud-opt-B">
+            <span class="opt-badge opt-B">B</span>
+            <span class="opt-text n64-text-outline" id="opt-text-B">OPCIÓN B</span>
+          </div>
+          <div class="hud-option" id="hud-opt-C">
+            <span class="opt-badge opt-C">C</span>
+            <span class="opt-text n64-text-outline" id="opt-text-C">OPCIÓN C</span>
+          </div>
+          <div class="hud-option" id="hud-opt-D">
+            <span class="opt-badge opt-D">D</span>
+            <span class="opt-text n64-text-outline" id="opt-text-D">OPCIÓN D</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="leaderboard-panel" class="n64-box">
+        <div class="lb-header">
+          <h2 class="n64-text-outline">ALTURA DE HONGOS</h2>
+          <span id="answered-counter">0/0 LISTOS</span>
+        </div>
+        <ul id="leaderboard-list">
+          <li class="team-row">
+            <span>SIN EQUIPOS CONECTADOS</span>
+            <span class="team-height-tag">0m</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Cartel Central de Transición Arcade N64 (START! / PREGUNTA / FINISH!) -->
+    <div id="arcade-banner-overlay">
+      <div id="arcade-banner-box">
+        <div id="arcade-banner-title">START!</div>
+        <div id="arcade-banner-sub" class="n64-text-outline">MUSHROOM PARTY CIAC</div>
+      </div>
+    </div>
+
+    <!-- Podio Final N64 al terminar las 15 preguntas -->
+    <div id="podium-overlay" class="n64-box">
+      <h2 class="n64-title" style="font-size:26px;">¡PODIO FINAL — 15 PREGUNTAS!</h2>
+      <p id="podium-winner-text" class="n64-text-outline" style="font-size:16px; color:#50F850; margin-top:4px;">
+        GANADOR A MAYOR ALTURA
+      </p>
+      <div class="podium-bars" id="podium-bars"></div>
+      <div style="margin-top:12px;">
+        <button id="btn-close-podium" class="n64-btn n64-btn-blue">VER ESCENARIO 3D COMPLETO</button>
+      </div>
+    </div>
+
+    <!-- Panel QR para Conexión de Equipos desde Teléfonos -->
+    <div id="qr-panel" class="n64-box">
+      <h3 class="n64-text-outline">CONECTA TU EQUIPO (QR)</h3>
+      <div id="qr-box">
+        <img id="qr-img" src="/api/qr.svg" alt="Código QR para equipos" />
+      </div>
+      <div id="join-url-text">CARGANDO DIRECCIÓN...</div>
+      <div style="margin-top:6px; display:flex; gap:5px; justify-content:center;">
+        <a href="/play" target="_blank" class="n64-btn n64-btn-blue" style="font-size:11px; padding:4px 7px; text-decoration:none;">
+          ABRIR MANDO
+        </a>
+        <button id="btn-toggle-qr" class="n64-btn n64-btn-gray" style="font-size:11px; padding:4px 7px;">
+          OCULTAR
+        </button>
+      </div>
+    </div>
+
+    <!-- Barra Inferior: Marquesina y Controles del Anfitrión -->
+    <div id="hud-bottom" class="n64-box">
+      <div id="event-banner" class="n64-text-outline">
+        SALA DE ESPERA — ESCANEA EL CÓDIGO QR CON TU TELÉFONO
+      </div>
+      <div id="host-controls">
+        <button id="btn-host-login" class="n64-btn n64-btn-gray">ANFITRIÓN</button>
+        <button id="btn-start" class="n64-btn n64-btn-green">INICIAR (1/15)</button>
+        <button id="btn-reveal" class="n64-btn n64-btn-yellow">EVALUAR Y MOVER HONGOS</button>
+        <button id="btn-next" class="n64-btn n64-btn-blue">SIGUIENTE ▶</button>
+        <button id="btn-bank" class="n64-btn n64-btn-gray" title="Cargar o editar el banco oficial de 15 preguntas">
+          BANCO 15 PREG.
+        </button>
+        <button id="btn-reset" class="n64-btn" title="Reiniciar alturas a 0m">
+          REINICIAR
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para cargar el Banco Oficial de 15 Preguntas -->
+  <div id="bank-modal">
+    <div id="bank-dialog" class="n64-box">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 class="n64-title" style="font-size:18px;">BANCO DE 15 PREGUNTAS (FORMATO JSON)</h2>
+        <button id="btn-close-bank" class="n64-btn">CERRAR [X]</button>
+      </div>
+      <p style="font-size:12px; color:#FFF8DC;">
+        Pega o edita aquí las 15 preguntas oficiales cuando sean entregadas. No contiene preguntas ni datos institucionales inventados.
+      </p>
+      <textarea id="bank-textarea" spellcheck="false"></textarea>
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button id="btn-save-bank" class="n64-btn n64-btn-green">GUARDAR 15 PREGUNTAS</button>
+      </div>
+    </div>
+  </div>
+
+  <dialog id="host-login-dialog" class="n64-box" style="max-width:90vw;color:#fff;background:#12305c;">
+    <form method="dialog">
+      <label for="host-password">Clave del anfitrión</label>
+      <input id="host-password" type="password" autocomplete="current-password" required style="display:block;margin:10px 0;" />
+      <button value="ok" class="n64-btn n64-btn-green">ENTRAR</button>
+      <button value="cancel" formnovalidate class="n64-btn">CANCELAR</button>
+    </form>
+  </dialog>
+  <script src="/stage.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "mushroom-party-ciac",
+  "version": "1.0.0",
+  "description": "Mushroom Party CIAC - Minijuego multijugador N64 inspirado en Mushroom Mix-Up",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

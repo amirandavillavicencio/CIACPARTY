@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>MUSHROOM PARTY CIAC — MANDO N64</title>
+  <style>
+    /*
+     * MANDO MÓVIL RETRO NINTENDO 64 PARA ANDROID Y iPHONE
+     * Cero degradados, cero sombras difusas, respuesta táctil inmediata (touch-action: manipulation),
+     * reconexión automática transparente y áreas seguras para notch / barra inferior iOS.
+     */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0C1844;
+      color: #FFF8DC;
+      font-family: "Courier New", "Lucida Console", monospace;
+      font-weight: 900;
+    }
+
+    .mobile-shell {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100dvh;
+      max-width: 520px;
+      margin: 0 auto;
+      padding:
+        max(10px, env(safe-area-inset-top))
+        12px
+        max(12px, env(safe-area-inset-bottom))
+        12px;
+      gap: 9px;
+    }
+
+    .n64-panel {
+      background-color: #102468;
+      border-top: 4px solid #70A0FF;
+      border-left: 4px solid #70A0FF;
+      border-right: 4px solid #060C28;
+      border-bottom: 4px solid #060C28;
+      outline: 3px solid #F8D820;
+      padding: 9px 11px;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title-bar {
+      color: #F8E020;
+      font-size: 16px;
+      text-shadow: 2px 2px 0px #000000;
+    }
+
+    .conn-dot {
+      display: inline-block;
+      padding: 2px 6px;
+      font-size: 11px;
+      background-color: #000000;
+      border: 2px solid #50F850;
+      color: #50F850;
+    }
+
+    .conn-dot.offline {
+      border-color: #FF6060;
+      color: #FF6060;
+    }
+
+    .status-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #000000;
+      border: 2px solid #5880D8;
+      padding: 6px 9px;
+      margin-top: 6px;
+      font-size: 13px;
+    }
+
+    .height-badge {
+      color: #50F850;
+      font-size: 15px;
+    }
+
+    /* Pantalla 1: Registro del Equipo */
+    #join-screen {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      margin: auto 0;
+    }
+
+    label {
+      font-size: 13px;
+      color: #F8E020;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .n64-input {
+      width: 100%;
+      background-color: #000000;
+      color: #FFF8DC;
+      border: 3px solid #F8D820;
+      padding: 11px;
+      font-family: inherit;
+      font-weight: 900;
+      font-size: 18px;
+      text-transform: uppercase;
+      border-radius: 0;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .char-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .char-option {
+      background-color: #081238;
+      border: 3px solid #4870C8;
+      color: #FFF8DC;
+      padding: 9px 8px;
+      font-family: inherit;
+      font-weight: 900;
+      font-size: 13px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .char-option.selected {
+      background-color: #1840A0;
+      border-color: #F8E020;
+      outline: 2px solid #FFFFFF;
+    }
+
+    .swatch {
+      width: 15px;
+      height: 15px;
+      border: 2px solid #FFFFFF;
+      flex-shrink: 0;
+    }
+
+    /* Pantalla 2: Mando de Respuesta A / B / C / D */
+    #controller-screen {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      gap: 9px;
+      min-height: 0;
+    }
+
+    .question-box {
+      background-color: #683810;
+      border-top: 4px solid #C07834;
+      border-left: 4px solid #C07834;
+      border-right: 4px solid #281004;
+      border-bottom: 4px solid #281004;
+      outline: 3px solid #000000;
+      padding: 8px 10px;
+    }
+
+    .q-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    #m-question-code {
+      color: #F8E020;
+      font-size: 14px;
+    }
+
+    #m-timer-pill {
+      background-color: #000000;
+      color: #50F850;
+      border: 2px solid #F8E020;
+      padding: 1px 6px;
+      font-size: 13px;
+    }
+
+    #m-question-prompt {
+      font-size: 13px;
+      color: #FFFFFF;
+      line-height: 1.25;
+    }
+
+    .pad-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 9px;
+      min-height: 0;
+    }
+
+    .pad-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+      font-weight: 900;
+      color: #FFFFFF;
+      cursor: pointer;
+      border-width: 6px;
+      border-style: solid;
+      outline: 3px solid #000000;
+      text-shadow: 2px 2px 0px #000000;
+      padding: 8px;
+    }
+
+    .pad-btn:active:not(:disabled) {
+      transform: translate(2px, 2px);
+    }
+
+    .pad-btn.selected-answer {
+      outline: 5px solid #FFF8DC;
+      box-shadow: inset 0 0 0 4px #000000;
+    }
+
+    .pad-btn.correct-answer {
+      outline: 5px solid #50F850;
+    }
+
+    .pad-btn:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+    }
+
+    .pad-letter {
+      font-size: 36px;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+
+    .pad-label {
+      font-size: 12px;
+      text-align: center;
+      word-break: break-word;
+      line-height: 1.15;
+    }
+
+    .pad-A {
+      background-color: #2060E8;
+      border-color: #78A8FF #081C60 #081C60 #78A8FF;
+    }
+    .pad-B {
+      background-color: #20A828;
+      border-color: #78F080 #08480C #08480C #78F080;
+    }
+    .pad-C {
+      background-color: #E8B810;
+      color: #000000;
+      text-shadow: 1px 1px 0px #FFF8DC;
+      border-color: #FFF078 #684800 #684800 #FFF078;
+    }
+    .pad-D {
+      background-color: #D82020;
+      border-color: #FF7878 #600808 #600808 #FF7878;
+    }
+
+    .n64-submit-btn {
+      background-color: #20A828;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-weight: 900;
+      font-size: 17px;
+      padding: 13px;
+      border-top: 4px solid #78F080;
+      border-left: 4px solid #78F080;
+      border-right: 4px solid #08480C;
+      border-bottom: 4px solid #08480C;
+      outline: 3px solid #000000;
+      cursor: pointer;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 0px #000000;
+    }
+
+    .bottom-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    #m-feedback-bar {
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+      background-color: #000000;
+      border: 3px solid #F8D820;
+      color: #F8E020;
+      font-size: 12px;
+    }
+
+    #btn-change-team {
+      background-color: #4C5668;
+      color: #FFF8DC;
+      border: 3px solid #909CB0;
+      font-family: inherit;
+      font-weight: 900;
+      font-size: 11px;
+      padding: 8px 7px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-shell">
+    <!-- Cabecera del Mando N64 -->
+    <div class="n64-panel">
+      <div class="top-row">
+        <span class="title-bar">MUSHROOM PARTY CIAC</span>
+        <span id="m-conn-dot" class="conn-dot">EN LÍNEA</span>
+      </div>
+      <div class="status-strip">
+        <span id="m-team-label">SIN EQUIPO</span>
+        <span class="height-badge" id="m-height-label">ALTURA: 0m</span>
+      </div>
+    </div>
+
+    <!-- Pantalla 1: Registro / Selección de Personaje y Hongo -->
+    <div id="join-screen" class="n64-panel">
+      <div>
+        <label for="team-name-input">1. NOMBRE DE TU EQUIPO:</label>
+        <input
+          id="team-name-input"
+          class="n64-input"
+          type="text"
+          maxlength="14"
+          placeholder="EJ: EQUIPO ROJO"
+          autocomplete="off"
+        />
+      </div>
+
+      <div>
+        <label>2. ELIGE PERSONAJE Y HONGO N64:</label>
+        <div class="char-grid" id="char-grid"></div>
+      </div>
+
+      <button id="btn-join" class="n64-submit-btn">SUBIR AL HONGO ▶</button>
+    </div>
+
+    <!-- Pantalla 2: Mando de Respuesta A / B / C / D -->
+    <div id="controller-screen">
+      <div class="question-box">
+        <div class="q-meta-row">
+          <span id="m-question-code">PREGUNTA 01 / 15</span>
+          <span id="m-timer-pill">--s</span>
+        </div>
+        <div id="m-question-prompt">MIRA LA PANTALLA PRINCIPAL</div>
+      </div>
+
+      <div class="pad-grid">
+        <button class="pad-btn pad-A" data-opt="A">
+          <span class="pad-letter">A</span>
+          <span class="pad-label" id="m-opt-A">OPCIÓN A</span>
+        </button>
+        <button class="pad-btn pad-B" data-opt="B">
+          <span class="pad-letter">B</span>
+          <span class="pad-label" id="m-opt-B">OPCIÓN B</span>
+        </button>
+        <button class="pad-btn pad-C" data-opt="C">
+          <span class="pad-letter">C</span>
+          <span class="pad-label" id="m-opt-C">OPCIÓN C</span>
+        </button>
+        <button class="pad-btn pad-D" data-opt="D">
+          <span class="pad-letter">D</span>
+          <span class="pad-label" id="m-opt-D">OPCIÓN D</span>
+        </button>
+      </div>
+
+      <div class="bottom-bar">
+        <div id="m-feedback-bar">ESPERANDO LA PREGUNTA...</div>
+        <button id="btn-change-team" title="Cambiar nombre o personaje">EQUIPO</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const ROSTER = [
+        { id: "mario", label: "MARIO", color: "#D91C1C" },
+        { id: "luigi", label: "LUIGI", color: "#2838B8" },
+        { id: "yoshi", label: "YOSHI", color: "#50B820" },
+        { id: "wario", label: "WARIO", color: "#E2BD18" },
+        { id: "dk", label: "D. KONG", color: "#78B5E0" },
+        { id: "peach", label: "PEACH", color: "#DD5878" },
+      ];
+
+      let selectedCharId = localStorage.getItem("mp_ciac_char_id") || "mario";
+      let myTeamId = localStorage.getItem("mp_ciac_team_id") || null;
+      let myTeamToken = localStorage.getItem("mp_ciac_team_token") || null;
+      let myTeamName = localStorage.getItem("mp_ciac_team_name") || "";
+      let myCurrentChoice = null;
+      let lastRoundSeq = -1;
+      let latestState = null;
+      let clientTimerEndsAt = null;
+      let autoRejoining = false;
+
+      const charGrid = document.getElementById("char-grid");
+      const nameInput = document.getElementById("team-name-input");
+      const connDot = document.getElementById("m-conn-dot");
+
+      if (myTeamName) nameInput.value = myTeamName;
+
+      // Vibración háptica en Android y tono corto WebAudio en iPhone/Android
+      let mobileAudioCtx = null;
+      function triggerHapticAndBeep(freq = 660) {
+        if (navigator.vibrate) {
+          try { navigator.vibrate(25); } catch (_) {}
+        }
+        try {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return;
+          if (!mobileAudioCtx) mobileAudioCtx = new AC();
+          if (mobileAudioCtx.state === "suspended") mobileAudioCtx.resume();
+          const osc = mobileAudioCtx.createOscillator();
+          const g = mobileAudioCtx.createGain();
+          osc.type = "square";
+          osc.frequency.setValueAtTime(freq, mobileAudioCtx.currentTime);
+          g.gain.setValueAtTime(0.08, mobileAudioCtx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.001, mobileAudioCtx.currentTime + 0.07);
+          osc.connect(g);
+          g.connect(mobileAudioCtx.destination);
+          osc.start();
+          osc.stop(mobileAudioCtx.currentTime + 0.08);
+        } catch (_) {}
+      }
+
+      function renderCharGrid() {
+        charGrid.innerHTML = ROSTER.map((c) => `
+          <button type="button" class="char-option ${c.id === selectedCharId ? "selected" : ""}" data-cid="${c.id}">
+            <span class="swatch" style="background-color:${c.color};"></span>
+            <span>${c.label}</span>
+          </button>
+        `).join("");
+
+        charGrid.querySelectorAll(".char-option").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            selectedCharId = btn.getAttribute("data-cid");
+            localStorage.setItem("mp_ciac_char_id", selectedCharId);
+            triggerHapticAndBeep(520);
+            renderCharGrid();
+          });
+        });
+      }
+      renderCharGrid();
+
+      async function joinTeam(silent = false) {
+        const name = (nameInput.value || myTeamName || "").trim().toUpperCase();
+        if (!name) {
+          if (!silent) alert("INGRESA EL NOMBRE DE TU EQUIPO");
+          return;
+        }
+        try {
+          const res = await fetch("/api/join", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              teamId: myTeamId,
+              teamToken: myTeamToken,
+              name,
+              characterId: selectedCharId,
+            }),
+          });
+          const data = await res.json();
+          if (data.error) {
+            if (!silent) alert(data.error);
+            return;
+          }
+          myTeamId = data.team.id;
+          myTeamToken = data.team.token;
+          localStorage.setItem("mp_ciac_team_token",myTeamToken);
+          myTeamName = data.team.name;
+          selectedCharId = data.team.characterId;
+          localStorage.setItem("mp_ciac_team_id", myTeamId);
+          localStorage.setItem("mp_ciac_team_name", myTeamName);
+          localStorage.setItem("mp_ciac_char_id", selectedCharId);
+
+          if (!silent) triggerHapticAndBeep(880);
+          document.getElementById("join-screen").style.display = "none";
+          document.getElementById("controller-screen").style.display = "flex";
+          syncUI(data.state);
+        } catch (err) {
+          if (!silent) alert("ERROR DE CONEXIÓN CON EL SERVIDOR");
+        }
+      }
+
+      document.getElementById("btn-join").addEventListener("click", () => joinTeam(false));
+
+      document.getElementById("btn-change-team").addEventListener("click", () => {
+        document.getElementById("controller-screen").style.display = "none";
+        document.getElementById("join-screen").style.display = "flex";
+      });
+
+      document.querySelectorAll(".pad-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          if (!myTeamId || !myTeamToken || !latestState) return;
+          const opt = btn.getAttribute("data-opt");
+          triggerHapticAndBeep(740);
+          try {
+            const res = await fetch("/api/answer", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ teamId: myTeamId, teamToken: myTeamToken, option: opt, roundSeq: latestState.roundSeq }),
+            });
+            const data = await res.json();
+            if (!res.ok) {document.getElementById("m-feedback-bar").textContent=data.error || "Respuesta rechazada";return;}
+            myCurrentChoice = opt;
+            highlightSelectedChoice(null);
+            document.getElementById("m-feedback-bar").textContent =
+              `RESPUESTA ENVIADA: OPCIÓN [${opt}]`;
+          } catch (_) {
+            document.getElementById("m-feedback-bar").textContent =
+              "REINTENTANDO ENVÍO DE RESPUESTA...";
+          }
+        });
+      });
+
+      function highlightSelectedChoice(correctOption) {
+        document.querySelectorAll(".pad-btn").forEach((btn) => {
+          const opt = btn.getAttribute("data-opt");
+          btn.classList.toggle("selected-answer", opt === myCurrentChoice);
+          btn.classList.toggle("correct-answer", Boolean(correctOption && opt === correctOption));
+        });
+      }
+
+      function syncUI(state) {
+        if (!state) return;
+        latestState = state;
+
+        if (state.timerEndsAt && state.serverNow) {
+          clientTimerEndsAt = state.timerEndsAt + (Date.now() - state.serverNow);
+        } else {
+          clientTimerEndsAt = null;
+        }
+
+        if (state.roundSeq !== lastRoundSeq) {
+          lastRoundSeq = state.roundSeq;
+          if (state.phase === "QUESTION_OPEN") {
+            myCurrentChoice = null;
+            highlightSelectedChoice(null);
+          }
+        }
+
+        const me = (state.teams || []).find((t) => t.id === myTeamId);
+        if (me && myTeamToken) {
+          document.getElementById("join-screen").style.display = "none";
+          document.getElementById("controller-screen").style.display = "flex";
+          document.getElementById("m-team-label").textContent =
+            `${me.name} (${me.characterLabel})`;
+          const sign = me.height >= 0 ? "+" : "";
+          document.getElementById("m-height-label").textContent =
+            `ALTURA: ${sign}${me.height}m`;
+        } else if (myTeamName && myTeamToken && !autoRejoining) {
+          // Reconexión automática si el teléfono vuelve de suspensión
+          autoRejoining = true;
+          joinTeam(true).finally(() => {
+            autoRejoining = false;
+          });
+        }
+
+        const q = state.currentQuestion;
+        if (q) {
+          document.getElementById("m-question-code").textContent = q.code;
+          document.getElementById("m-question-prompt").textContent = q.prompt;
+          for (const o of q.options || []) {
+            const lbl = document.getElementById(`m-opt-${o.key}`);
+            if (lbl) lbl.textContent = o.label;
+          }
+          highlightSelectedChoice(
+            state.phase === "QUESTION_REVEALED" || state.phase === "FINISHED"
+              ? q.correctOption
+              : null
+          );
+        }
+
+        const buttons = document.querySelectorAll(".pad-btn");
+        const feedback = document.getElementById("m-feedback-bar");
+
+        if (state.phase === "LOBBY") {
+          buttons.forEach((b) => (b.disabled = true));
+          feedback.textContent = "EN SALA DE ESPERA — MIRA TU HONGO EN PANTALLA";
+        } else if (state.phase === "QUESTION_OPEN") {
+          buttons.forEach((b) => (b.disabled = !me || Date.now()>=clientTimerEndsAt));
+          if (me && me.answered && myCurrentChoice) {
+            feedback.textContent = `OPCIÓN [${myCurrentChoice}] REGISTRADA (PUEDES CAMBIARLA)`;
+          } else {
+            feedback.textContent = "¡TOCA A, B, C o D PARA SUBIR TU HONGO!";
+          }
+        } else if (state.phase === "QUESTION_REVEALED") {
+          buttons.forEach((b) => (b.disabled = true));
+          if (me) {
+            if (me.lastDelta > 0) {
+              feedback.textContent = "¡CORRECTO! ↑ TU HONGO SUBE (+1m)";
+            } else {
+              feedback.textContent = "INCORRECTO ↓ TU HONGO BAJA (-1m) — SIGUES EN JUEGO";
+            }
+          }
+        } else if (state.phase === "FINISHED") {
+          buttons.forEach((b) => (b.disabled = true));
+          const isWinner = (state.winners || []).some((w) => w.id === myTeamId);
+          feedback.textContent = isWinner
+            ? "★ ¡GANASTE A MAYOR ALTURA! ★"
+            : "FIN DE LAS 15 PREGUNTAS — MIRA EL PODIO";
+        }
+      }
+
+      // Actualizar píldora de tiempo en el móvil
+      setInterval(() => {
+        const pill = document.getElementById("m-timer-pill");
+        if (!pill) return;
+        if (!latestState || latestState.phase !== "QUESTION_OPEN" || !clientTimerEndsAt) {
+          pill.textContent = "--s";
+          return;
+        }
+        const rem = Math.max(0, Math.ceil((clientTimerEndsAt - Date.now()) / 1000));
+        pill.textContent = `${String(rem).padStart(2, "0")}s`;
+      }, 250);
+
+      async function poll() {
+        try { const r=await fetch("/api/state",{cache:"no-store"});if(!r.ok)throw Error();syncUI(await r.json());connDot.textContent="EN LÍNEA";connDot.classList.remove("offline"); }
+        catch (_) {connDot.textContent="RECONECTANDO...";connDot.classList.add("offline");}
+        setTimeout(poll,1000);
+      }
+      poll();
+
+      // Al desbloquear la pantalla del teléfono, resincronizar estado inmediatamente
+      document.addEventListener("visibilitychange", async () => {
+        if (document.visibilityState === "visible") {
+          try {
+            const res = await fetch("/api/state");
+            if (res.ok) syncUI(await res.json());
+          } catch (_) {}
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

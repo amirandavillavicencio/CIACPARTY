@@ -1,0 +1,52 @@
+import assert from 'node:assert/strict';
+import {initialState,handleGame} from './game.mjs';
+import {CiacpartyGame} from './worker.mjs';
+const secret=crypto.randomUUID();
+let state=initialState();
+const ask=(method,path,body={},auth)=>handleGame(state,{method,path,origin:'https://ciacparty.pages.dev',body,auth},secret);
+const host=(action,extra={})=>ask('POST','/api/host/action',{action,...extra},secret);
+assert.equal((await ask('GET','/api/questions')).status,401);
+assert.equal((await ask('POST','/api/host/action',{action:'CLEAR_TEAMS'})).status,401);
+assert.equal((await host('START_GAME')).status,409);
+assert.equal((await host('LOAD_QUESTIONS',{questions:[]})).status,400);
+// Fixture generated only in memory for test; never included in the deployed question bank.
+const questions=Array.from({length:15},(_,i)=>({prompt:String(i+1),options:['1','2','3','4'],correctOption:'B'}));
+assert.equal((await host('LOAD_QUESTIONS',{questions})).status,200);
+assert.equal((await ask('GET','/api/questions',{},secret)).data.questions.length,15);
+assert.equal((await ask('GET','/api/state')).data.currentQuestion,null);
+const a=(await ask('POST','/api/join',{name:'1',characterId:'mario'})).data.team;
+const b=(await ask('POST','/api/join',{name:'2',characterId:'mario'})).data.team;
+assert.notEqual(a.characterId,b.characterId);
+assert.equal((await ask('POST','/api/join',{name:'1',teamId:a.id})).status,409);
+assert.equal((await ask('POST','/api/join',{name:'1',teamId:a.id,teamToken:a.token})).data.team.id,a.id);
+assert.equal((await host('START_GAME')).status,200);
+for(let i=0;i<15;i++){
+ const st=(await ask('GET','/api/state')).data;
+ assert.equal(st.currentQuestion.correctOption,null);
+ assert.equal('hostCorrectOption' in st.currentQuestion,false);
+ assert.equal(JSON.stringify(st).includes(a.token),false);
+ assert.equal((await ask('POST','/api/answer',{teamId:a.id,teamToken:b.token,option:'B',roundSeq:st.roundSeq})).status,403);
+ assert.equal((await ask('POST','/api/answer',{teamId:a.id,teamToken:a.token,option:'B',roundSeq:st.roundSeq-1})).status,409);
+ assert.equal((await ask('POST','/api/answer',{teamId:a.id,teamToken:a.token,option:'B',roundSeq:st.roundSeq})).status,200);
+ assert.equal((await ask('POST','/api/answer',{teamId:b.id,teamToken:b.token,option:'A',roundSeq:st.roundSeq})).status,200);
+ assert.equal((await ask('GET','/api/state')).data.teams[0].currentAnswer,null);
+ assert.equal((await host('NEXT_QUESTION')).status,409);
+ state.timerEndsAt=Date.now()-1;
+ assert.equal((await ask('POST','/api/answer',{teamId:a.id,teamToken:a.token,option:'A',roundSeq:st.roundSeq})).status,409);
+ const revealed=await host('REVEAL_AND_MOVE',{correctOption:'A'});
+ assert.equal(revealed.data.currentQuestion.correctOption,'B');
+ assert.equal(revealed.data.teams[0].height,i+1);
+ assert.equal(revealed.data.teams[1].height,-i-1);
+ assert.equal((await host('REVEAL_AND_MOVE')).status,409);
+ assert.equal((await host('NEXT_QUESTION')).status,200);
+}
+assert.equal(state.phase,'FINISHED');assert.equal(state.teams.length,2);
+// Durable Object contract simulated, including reload from storage.
+const map=new Map();const ctx={storage:{get:async k=>structuredClone(map.get(k)),put:async(k,v)=>map.set(k,structuredClone(v))},blockConcurrencyWhile:async f=>f()};
+let obj=new CiacpartyGame(ctx,{HOST_KEY:secret});
+const request=(method,path,body,auth)=>new Request('https://ciacparty.pages.dev'+path,{method,headers:{...(auth?{'X-Host-Key':auth}:{}),...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})});
+assert.equal((await obj.fetch(request('POST','/api/host/action',{action:'LOAD_QUESTIONS',questions},secret))).status,200);
+obj=new CiacpartyGame(ctx,{HOST_KEY:secret});
+assert.equal((await (await obj.fetch(request('GET','/api/questions',null,secret))).json()).questions.length,15);
+assert.equal((await obj.fetch(request('GET','/api/questions'))).status,401);
+console.log('OK: acceso, banco, claves, tokens, caducidad, 15 rondas, podio y persistencia simulada.');

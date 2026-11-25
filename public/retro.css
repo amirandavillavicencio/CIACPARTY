@@ -1,0 +1,638 @@
+/*
+ * ESTÉTICA NINTENDO 64 (1998) — HUDSON SOFT / MARIO PARTY
+ * Sin degradados modernos, sin sombras difusas, sin bordes redondeados tipo tarjeta web.
+ * Geometría sólida biselada a 4px, colores planos saturados y tipografía arcade pixelada.
+ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0C1844;
+  color: #FFF8DC;
+  font-family: "Courier New", "Lucida Console", monospace;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  image-rendering: pixelated;
+}
+
+/* Marcos biselados N64 */
+.n64-box {
+  background-color: #102468;
+  border-top: 4px solid #70A0FF;
+  border-left: 4px solid #70A0FF;
+  border-right: 4px solid #060C28;
+  border-bottom: 4px solid #060C28;
+  outline: 3px solid #F8D820;
+  box-shadow: 6px 6px 0px #000000;
+}
+
+.n64-box-wood {
+  background-color: #683810;
+  border-top: 4px solid #C07834;
+  border-left: 4px solid #C07834;
+  border-right: 4px solid #281004;
+  border-bottom: 4px solid #281004;
+  outline: 3px solid #000000;
+  box-shadow: 6px 6px 0px #000000;
+}
+
+.n64-box-black {
+  background-color: #060A1C;
+  border-top: 3px solid #4870C8;
+  border-left: 3px solid #4870C8;
+  border-right: 3px solid #000000;
+  border-bottom: 3px solid #000000;
+  outline: 2px solid #000000;
+}
+
+.n64-title {
+  color: #F8E020;
+  text-shadow:
+    3px 3px 0px #000000,
+    -2px -2px 0px #B81818,
+    2px -2px 0px #000000,
+    -2px 2px 0px #000000;
+  text-transform: uppercase;
+}
+
+.n64-text-outline {
+  text-shadow:
+    2px 2px 0px #000000,
+    -1px -1px 0px #000000,
+    1px -1px 0px #000000,
+    -1px 1px 0px #000000;
+}
+
+/* Botonera física biselada */
+.n64-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background-color: #D82020;
+  color: #FFF8DC;
+  font-family: "Courier New", "Lucida Console", monospace;
+  font-weight: 900;
+  font-size: 13px;
+  padding: 7px 12px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-top: 4px solid #FF8080;
+  border-left: 4px solid #FF8080;
+  border-right: 4px solid #580606;
+  border-bottom: 4px solid #580606;
+  outline: 2px solid #000000;
+  text-shadow: 2px 2px 0px #000000;
+}
+
+.n64-btn:hover {
+  filter: brightness(1.08);
+}
+
+.n64-btn:active {
+  transform: translate(2px, 2px);
+  border-top-color: #580606;
+  border-left-color: #580606;
+  border-right-color: #FF8080;
+  border-bottom-color: #FF8080;
+}
+
+.n64-btn-green {
+  background-color: #20A828;
+  border-top-color: #78F080;
+  border-left-color: #78F080;
+  border-right-color: #08480C;
+  border-bottom-color: #08480C;
+}
+
+.n64-btn-blue {
+  background-color: #2050D8;
+  border-top-color: #78A0FF;
+  border-left-color: #78A0FF;
+  border-right-color: #081858;
+  border-bottom-color: #081858;
+}
+
+.n64-btn-yellow {
+  background-color: #E8B810;
+  color: #000000;
+  text-shadow: 1px 1px 0px #FFF8DC;
+  border-top-color: #FFF078;
+  border-left-color: #FFF078;
+  border-right-color: #684800;
+  border-bottom-color: #684800;
+}
+
+.n64-btn-gray {
+  background-color: #4C5668;
+  border-top-color: #909CB0;
+  border-left-color: #909CB0;
+  border-right-color: #1C2028;
+  border-bottom-color: #1C2028;
+}
+
+/* Contenedor Principal */
+#stage-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-color: #2070D8;
+}
+
+#n64-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+/* HUD Superior */
+#hud-top {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#hud-top > * {
+  pointer-events: auto;
+}
+
+#brand-panel {
+  padding: 9px 12px;
+  width: 268px;
+  flex-shrink: 0;
+}
+
+#brand-panel h1 {
+  font-size: 20px;
+  line-height: 1.05;
+  margin-bottom: 5px;
+}
+
+.top-badges {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+#rom-badge {
+  display: inline-block;
+  background-color: #000000;
+  color: #50F850;
+  font-size: 10px;
+  padding: 2px 5px;
+  border: 2px solid #50F850;
+}
+
+.rules-list {
+  font-size: 11px;
+  line-height: 1.35;
+  color: #FFF8DC;
+  border-top: 2px solid #4870C8;
+  padding-top: 5px;
+}
+
+/* Tablero Central de Pregunta y Cuenta Regresiva */
+#question-hud {
+  flex: 1;
+  max-width: 790px;
+  padding: 10px 14px;
+}
+
+#question-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  border-bottom: 3px solid #F8D820;
+  padding-bottom: 5px;
+}
+
+#question-counter {
+  font-size: 18px;
+  color: #F8E020;
+}
+
+/* Progreso de las 15 preguntas en bloques pixelados */
+#progress-blocks {
+  display: flex;
+  gap: 3px;
+}
+
+.q-dot {
+  width: 12px;
+  height: 12px;
+  background-color: #201004;
+  border: 2px solid #A87038;
+}
+
+.q-dot.done {
+  background-color: #20A828;
+  border-color: #88F888;
+}
+
+.q-dot.current {
+  background-color: #F8E020;
+  border-color: #FFFFFF;
+}
+
+#timer-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #000000;
+  color: #50F850;
+  border: 3px solid #F8E020;
+  padding: 2px 8px;
+  font-size: 17px;
+}
+
+#timer-box.urgent {
+  background-color: #B80808;
+  color: #FFF8DC;
+  border-color: #FFFFFF;
+}
+
+#phase-pill {
+  background-color: #2050D8;
+  color: #FFF8DC;
+  padding: 3px 8px;
+  border: 2px solid #FFF8DC;
+  font-size: 12px;
+}
+
+#question-prompt {
+  font-size: 18px;
+  line-height: 1.25;
+  color: #FFFFFF;
+  margin: 7px 0 9px 0;
+  min-height: 24px;
+}
+
+#options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.hud-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #0A1640;
+  border-top: 3px solid #6890E8;
+  border-left: 3px solid #6890E8;
+  border-right: 3px solid #04081C;
+  border-bottom: 3px solid #04081C;
+  padding: 6px 9px;
+  font-size: 14px;
+}
+
+.hud-option.correct-highlight {
+  background-color: #188820;
+  border-color: #88F888 #08380C #08380C #88F888;
+  outline: 3px solid #F8E020;
+}
+
+. hud-option.wrong-dim {
+  opacity: 0.48;
+}
+
+.opt-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  font-size: 16px;
+  color: #FFFFFF;
+  border: 2px solid #000000;
+  flex-shrink: 0;
+}
+
+.opt-A { background-color: #2060E8; }
+.opt-B { background-color: #20A828; }
+.opt-C { background-color: #E8B810; color: #000000; }
+.opt-D { background-color: #D82020; }
+
+/* Escalímetro y Tabla de Alturas (Derecha) */
+#leaderboard-panel {
+  width: 286px;
+  padding: 9px 11px;
+  flex-shrink: 0;
+}
+
+.lb-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid #F8E020;
+  padding-bottom: 4px;
+  margin-bottom: 7px;
+}
+
+.lb-header h2 {
+  font-size: 15px;
+  color: #F8E020;
+}
+
+#answered-counter {
+  background-color: #000000;
+  color: #80F880;
+  border: 2px solid #4870C8;
+  padding: 1px 6px;
+  font-size: 11px;
+}
+
+#leaderboard-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.team-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #081238;
+  border: 2px solid #4870C8;
+  padding: 5px 7px;
+  font-size: 12px;
+}
+
+.team-row.leader-row {
+  border-color: #F8E020;
+  background-color: #142868;
+}
+
+.team-swatch {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border: 2px solid #FFFFFF;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+.team-height-tag {
+  background-color: #000000;
+  color: #F8E020;
+  padding: 2px 6px;
+  border: 2px solid #F8E020;
+  font-size: 12px;
+}
+
+.delta-up {
+  color: #50F850;
+  margin-left: 4px;
+}
+
+.delta-down {
+  color: #FF6868;
+  margin-left: 4px;
+}
+
+/* Panel QR para conexión de teléfonos */
+#qr-panel {
+  position: absolute;
+  bottom: 68px;
+  left: 10px;
+  width: 238px;
+  padding: 9px;
+  text-align: center;
+  z-index: 10;
+}
+
+#qr-panel h3 {
+  font-size: 13px;
+  color: #F8E020;
+  margin-bottom: 5px;
+}
+
+#qr-box {
+  width: 156px;
+  height: 156px;
+  margin: 0 auto 6px auto;
+  background-color: #FFF8DC;
+  border: 4px solid #000000;
+  padding: 4px;
+}
+
+#qr-box img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#join-url-text {
+  font-size: 11px;
+  color: #80F880;
+  background-color: #000000;
+  padding: 4px;
+  border: 2px solid #4870C8;
+  word-break: break-all;
+}
+
+/* Cartel Gigante Retro de Transición N64 ("START!", "FINISH!", "¡SUBEN!") */
+#arcade-banner-overlay {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 25;
+  display: none;
+  text-align: center;
+}
+
+#arcade-banner-overlay.visible {
+  display: block;
+}
+
+#arcade-banner-box {
+  background-color: #102468;
+  border-top: 6px solid #FFF078;
+  border-left: 6px solid #FFF078;
+  border-right: 6px solid #684800;
+  border-bottom: 6px solid #684800;
+  outline: 4px solid #000000;
+  box-shadow: 10px 10px 0px #000000;
+  padding: 16px 32px;
+}
+
+#arcade-banner-title {
+  font-size: 42px;
+  color: #F8E020;
+  text-shadow:
+    4px 4px 0px #000000,
+    -3px -3px 0px #D82020,
+    3px -3px 0px #000000,
+    -3px 3px 0px #000000;
+}
+
+#arcade-banner-sub {
+  font-size: 16px;
+  color: #FFFFFF;
+  margin-top: 6px;
+}
+
+/* Podio Final N64 al concluir las 15 preguntas */
+#podium-overlay {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 22;
+  display: none;
+  width: 580px;
+  max-width: 92vw;
+  padding: 16px;
+  text-align: center;
+}
+
+#podium-overlay.visible {
+  display: block;
+}
+
+.podium-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 14px;
+  min-height: 170px;
+}
+
+.podium-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.podium-block {
+  width: 100%;
+  border-top: 4px solid #FFF078;
+  border-left: 4px solid #FFF078;
+  border-right: 4px solid #483000;
+  border-bottom: 4px solid #483000;
+  outline: 3px solid #000000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+/* Barra Inferior del Anfitrión */
+#hud-bottom {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 12px;
+  z-index: 15;
+}
+
+#event-banner {
+  font-size: 14px;
+  color: #F8E020;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#host-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.n64-select-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #000000;
+  padding: 4px 7px;
+  border: 2px solid #F8D820;
+  font-size: 12px;
+}
+
+.n64-select-wrap select {
+  background-color: #102468;
+  color: #F8E020;
+  border: 2px solid #FFF8DC;
+  font-family: inherit;
+  font-weight: 900;
+  font-size: 13px;
+  padding: 1px 4px;
+}
+
+/* Modal N64 del Banco de 15 Preguntas */
+#bank-modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+#bank-modal.open {
+  display: flex;
+}
+
+#bank-dialog {
+  width: 100%;
+  max-width: 780px;
+  max-height: 90vh;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#bank-textarea {
+  width: 100%;
+  height: 360px;
+  background-color: #050A1E;
+  color: #78F878;
+  border: 3px solid #6898F8;
+  font-family: "Courier New", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px;
+  user-select: text;
+  -webkit-user-select: text;
+}
