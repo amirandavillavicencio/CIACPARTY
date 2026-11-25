@@ -412,10 +412,13 @@
         { id: "peach", label: "PEACH", color: "#DD5878" },
       ];
 
-      let selectedCharId = localStorage.getItem("mp_ciac_char_id") || "mario";
-      let myTeamId = localStorage.getItem("mp_ciac_team_id") || null;
-      let myTeamToken = localStorage.getItem("mp_ciac_team_token") || null;
-      let myTeamName = localStorage.getItem("mp_ciac_team_name") || "";
+      const room = new URLSearchParams(location.search).get("room") || "";
+      const roomApi = path => path + "?room=" + encodeURIComponent(room);
+      const roomStorage = key => key + ":" + room;
+      let selectedCharId = localStorage.getItem(roomStorage("mp_ciac_char_id")) || "mario";
+      let myTeamId = localStorage.getItem(roomStorage("mp_ciac_team_id")) || null;
+      let myTeamToken = localStorage.getItem(roomStorage("mp_ciac_team_token")) || null;
+      let myTeamName = localStorage.getItem(roomStorage("mp_ciac_team_name")) || "";
       let myCurrentChoice = null;
       let lastRoundSeq = -1;
       let latestState = null;
@@ -427,6 +430,7 @@
       const connDot = document.getElementById("m-conn-dot");
 
       if (myTeamName) nameInput.value = myTeamName;
+      if (!room) { document.getElementById("btn-join").disabled=true; connDot.textContent="ESCANEA EL QR DE LA PARTIDA"; }
 
       // Vibración háptica en Android y tono corto WebAudio en iPhone/Android
       let mobileAudioCtx = null;
@@ -463,7 +467,7 @@
         charGrid.querySelectorAll(".char-option").forEach((btn) => {
           btn.addEventListener("click", () => {
             selectedCharId = btn.getAttribute("data-cid");
-            localStorage.setItem("mp_ciac_char_id", selectedCharId);
+            localStorage.setItem(roomStorage("mp_ciac_char_id"), selectedCharId);
             triggerHapticAndBeep(520);
             renderCharGrid();
           });
@@ -478,7 +482,7 @@
           return;
         }
         try {
-          const res = await fetch("/api/join", {
+          const res = await fetch(roomApi("/api/join"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -495,12 +499,12 @@
           }
           myTeamId = data.team.id;
           myTeamToken = data.team.token;
-          localStorage.setItem("mp_ciac_team_token",myTeamToken);
+          localStorage.setItem(roomStorage("mp_ciac_team_token"),myTeamToken);
           myTeamName = data.team.name;
           selectedCharId = data.team.characterId;
-          localStorage.setItem("mp_ciac_team_id", myTeamId);
-          localStorage.setItem("mp_ciac_team_name", myTeamName);
-          localStorage.setItem("mp_ciac_char_id", selectedCharId);
+          localStorage.setItem(roomStorage("mp_ciac_team_id"), myTeamId);
+          localStorage.setItem(roomStorage("mp_ciac_team_name"), myTeamName);
+          localStorage.setItem(roomStorage("mp_ciac_char_id"), selectedCharId);
 
           if (!silent) triggerHapticAndBeep(880);
           document.getElementById("join-screen").style.display = "none";
@@ -524,7 +528,7 @@
           const opt = btn.getAttribute("data-opt");
           triggerHapticAndBeep(740);
           try {
-            const res = await fetch("/api/answer", {
+            const res = await fetch(roomApi("/api/answer"), {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ teamId: myTeamId, teamToken: myTeamToken, option: opt, roundSeq: latestState.roundSeq }),
@@ -644,7 +648,7 @@
       }, 250);
 
       async function poll() {
-        try { const r=await fetch("/api/state",{cache:"no-store"});if(!r.ok)throw Error();syncUI(await r.json());connDot.textContent="EN LÍNEA";connDot.classList.remove("offline"); }
+        try { const r=await fetch(roomApi("/api/state"),{cache:"no-store"});if(!r.ok)throw Error();syncUI(await r.json());connDot.textContent="EN LÍNEA";connDot.classList.remove("offline"); }
         catch (_) {connDot.textContent="RECONECTANDO...";connDot.classList.add("offline");}
         setTimeout(poll,1000);
       }
@@ -654,7 +658,7 @@
       document.addEventListener("visibilitychange", async () => {
         if (document.visibilityState === "visible") {
           try {
-            const res = await fetch("/api/state");
+            const res = await fetch(roomApi("/api/state"));
             if (res.ok) syncUI(await res.json());
           } catch (_) {}
         }
