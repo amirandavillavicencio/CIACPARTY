@@ -1073,7 +1073,7 @@
                 ${escapeHtml(t.name)}
               </div>
               <div style="font-size:11px; color:#A8C8FF; margin-bottom:6px;">
-                ${t.characterLabel} (${t.correctCount}/15 ACIERTOS)
+                ${t.characterLabel} (${t.correctCount}/10 ACIERTOS)
               </div>
               <div class="podium-block" style="height:${heightsPx[i] || 80}px; background-color:${t.color};">
                 <div class="n64-text-outline" style="font-size:16px; color:#FFFFFF;">${medals[i]}</div>
@@ -1125,7 +1125,7 @@
           1750
         );
       } else if (state.phase === "FINISHED") {
-        showArcadeBanner("FINISH!", "¡FIN DE LAS 15 PREGUNTAS!", 2100);
+        showArcadeBanner("FINISH!", "¡FIN DE LAS 10 PREGUNTAS!", 2100);
       }
       lastSeenPhase = state.phase;
       lastSeenRoundSeq = state.roundSeq;
@@ -1145,7 +1145,7 @@
       banner.textContent = state.lastEventBanner;
     }
 
-    renderProgressBlocks(state.currentQuestionIndex || 0, state.totalQuestions || 15, state.phase);
+    renderProgressBlocks(state.currentQuestionIndex || 0, state.totalQuestions || 10, state.phase);
 
     const totalTeams = (state.teams || []).length;
     const readyTeams = (state.teams || []).filter((t) => t.answered).length;
@@ -1290,7 +1290,7 @@
     e.target.textContent = hidden ? "OCULTAR" : "MOSTRAR QR";
   });
 
-  // Modal de Banco de 15 Preguntas
+  // Modal de Banco de 10 Preguntas
   const bankModal = document.getElementById("bank-modal");
   const bankTextarea = document.getElementById("bank-textarea");
 
@@ -1314,7 +1314,7 @@
     try {
       const parsed = JSON.parse(bankTextarea.value);
       const arr = Array.isArray(parsed) ? parsed : parsed.questions;
-      if (!Array.isArray(arr)) throw new Error("Formato inválido: se esperaba una lista de 15 preguntas");
+      if (!Array.isArray(arr)) throw new Error("Formato inválido: se esperaba una lista de 10 preguntas");
       if (await hostAction({ action: "LOAD_QUESTIONS", questions: arr })) bankModal.classList.remove("open");
     } catch (err) {
       alert("Error en JSON: " + err.message);
