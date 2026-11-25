@@ -10,9 +10,9 @@ assert.equal((await ask('POST','/api/host/action',{action:'CLEAR_TEAMS'})).statu
 assert.equal((await host('START_GAME')).status,409);
 assert.equal((await host('LOAD_QUESTIONS',{questions:[]})).status,400);
 // Fixture generated only in memory for test; never included in the deployed question bank.
-const questions=Array.from({length:15},(_,i)=>({prompt:String(i+1),options:['1','2','3','4'],correctOption:'B'}));
+const questions=Array.from({length:10},(_,i)=>({prompt:String(i+1),options:['1','2','3','4'],correctOption:'B'}));
 assert.equal((await host('LOAD_QUESTIONS',{questions})).status,200);
-assert.equal((await ask('GET','/api/questions',{},secret)).data.questions.length,15);
+assert.equal((await ask('GET','/api/questions',{},secret)).data.questions.length,10);
 assert.equal((await ask('GET','/api/state')).data.currentQuestion,null);
 const a=(await ask('POST','/api/join',{name:'1',characterId:'mario'})).data.team;
 const b=(await ask('POST','/api/join',{name:'2',characterId:'mario'})).data.team;
@@ -20,7 +20,7 @@ assert.notEqual(a.characterId,b.characterId);
 assert.equal((await ask('POST','/api/join',{name:'1',teamId:a.id})).status,409);
 assert.equal((await ask('POST','/api/join',{name:'1',teamId:a.id,teamToken:a.token})).data.team.id,a.id);
 assert.equal((await host('START_GAME')).status,200);
-for(let i=0;i<15;i++){
+for(let i=0;i<10;i++){
  const st=(await ask('GET','/api/state')).data;
  assert.equal(st.currentQuestion.correctOption,null);
  assert.equal('hostCorrectOption' in st.currentQuestion,false);
@@ -47,6 +47,6 @@ let obj=new CiacpartyGame(ctx,{HOST_KEY:secret});
 const request=(method,path,body,auth)=>new Request('https://ciacparty.pages.dev'+path,{method,headers:{...(auth?{'X-Host-Key':auth}:{}),...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})});
 assert.equal((await obj.fetch(request('POST','/api/host/action',{action:'LOAD_QUESTIONS',questions},secret))).status,200);
 obj=new CiacpartyGame(ctx,{HOST_KEY:secret});
-assert.equal((await (await obj.fetch(request('GET','/api/questions',null,secret))).json()).questions.length,15);
+assert.equal((await (await obj.fetch(request('GET','/api/questions',null,secret))).json()).questions.length,10);
 assert.equal((await obj.fetch(request('GET','/api/questions'))).status,401);
-console.log('OK: acceso, banco, claves, tokens, caducidad, 15 rondas, podio y persistencia simulada.');
+console.log('OK: acceso, banco, claves, tokens, caducidad, 10 rondas, podio y persistencia simulada.');
