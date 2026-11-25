@@ -358,18 +358,18 @@
       </div>
 
       <div>
-        <label>2. ELIGE PERSONAJE Y HONGO N64:</label>
+        <label>2. ELIGE PERSONAJE Y PLATAFORMA:</label>
         <div class="char-grid" id="char-grid"></div>
       </div>
 
-      <button id="btn-join" class="n64-submit-btn">SUBIR AL HONGO ▶</button>
+      <button id="btn-join" class="n64-submit-btn">SÚBETE A LA PLATAFORMA ▶</button>
     </div>
 
     <!-- Pantalla 2: Mando de Respuesta A / B / C / D -->
     <div id="controller-screen">
       <div class="question-box">
         <div class="q-meta-row">
-          <span id="m-question-code">PREGUNTA 01 / 15</span>
+          <span id="m-question-code">PREGUNTA 01 / 10</span>
           <span id="m-timer-pill">--s</span>
         </div>
         <div id="m-question-prompt">MIRA LA PANTALLA PRINCIPAL</div>
@@ -605,21 +605,21 @@
 
         if (state.phase === "LOBBY") {
           buttons.forEach((b) => (b.disabled = true));
-          feedback.textContent = "EN SALA DE ESPERA — MIRA TU HONGO EN PANTALLA";
+          feedback.textContent = "EN SALA DE ESPERA — MIRA TU PLATAFORMA EN PANTALLA";
         } else if (state.phase === "QUESTION_OPEN") {
           buttons.forEach((b) => (b.disabled = !me || Date.now()>=clientTimerEndsAt));
           if (me && me.answered && myCurrentChoice) {
             feedback.textContent = `OPCIÓN [${myCurrentChoice}] REGISTRADA (PUEDES CAMBIARLA)`;
           } else {
-            feedback.textContent = "¡TOCA A, B, C o D PARA SUBIR TU HONGO!";
+            feedback.textContent = "¡TOCA A, B, C o D PARA SUBIR TU PLATAFORMA!";
           }
         } else if (state.phase === "QUESTION_REVEALED") {
           buttons.forEach((b) => (b.disabled = true));
           if (me) {
             if (me.lastDelta > 0) {
-              feedback.textContent = "¡CORRECTO! ↑ TU HONGO SUBE (+1m)";
+              feedback.textContent = "¡CORRECTO! ↑ TU PLATAFORMA SUBE (+1m)";
             } else {
-              feedback.textContent = "INCORRECTO ↓ TU HONGO BAJA (-1m) — SIGUES EN JUEGO";
+              feedback.textContent = "INCORRECTO ↓ TU PLATAFORMA BAJA (-1m) — SIGUES EN JUEGO";
             }
           }
         } else if (state.phase === "FINISHED") {
@@ -627,7 +627,7 @@
           const isWinner = (state.winners || []).some((w) => w.id === myTeamId);
           feedback.textContent = isWinner
             ? "★ ¡GANASTE A MAYOR ALTURA! ★"
-            : "FIN DE LAS 15 PREGUNTAS — MIRA EL PODIO";
+            : "FIN DE LAS 10 PREGUNTAS — MIRA EL PODIO";
         }
       }
 
