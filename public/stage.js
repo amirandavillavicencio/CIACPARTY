@@ -1235,26 +1235,23 @@
     podiumRendered = state.phase === "FINISHED";
   }
 
-  let hostKey = sessionStorage.getItem("ciacparty-host-key") || "";
-  async function authenticate(force = false) {
-    if (force || !hostKey) {
-      const dialog=document.getElementById("host-login-dialog"), input=document.getElementById("host-password");
-      if(dialog.open)return false;
-      input.value="";dialog.returnValue="cancel";dialog.showModal();input.focus();
-      const value=await new Promise(resolve=>dialog.addEventListener("close",()=>resolve(dialog.returnValue==="ok"?input.value:""),{once:true}));
-      input.value="";if(!value)return false;hostKey=value;
-    }
-    if (!hostKey) return false;
-    const res = await fetch("/api/host/check", {headers:{"X-Host-Key":hostKey}});
-    if (!res.ok) {hostKey="";sessionStorage.removeItem("ciacparty-host-key");alert("Clave incorrecta.");return false;}
-    sessionStorage.setItem("ciacparty-host-key",hostKey);return true;
+  const roomKey = "ciacparty-room-v2";
+  let room = localStorage.getItem(roomKey) || crypto.randomUUID();
+  let hostKey = localStorage.getItem(roomKey+"-host") || crypto.randomUUID()+crypto.randomUUID();
+  localStorage.setItem(roomKey,room);
+  localStorage.setItem(roomKey+"-host",hostKey);
+  const roomApi = path => path + "?room=" + encodeURIComponent(room);
+  let sessionReady;
+  function authenticate() {
+    if (!sessionReady) sessionReady = fetch(roomApi("/api/host/session"), {method:"POST",headers:{"Content-Type":"application/json","X-Host-Key":hostKey},body:"{}"}).then(r=>{if(!r.ok)throw Error("No se pudo abrir la sala.");return true;}).catch(err=>{sessionReady=null;throw err;});
+    return sessionReady;
   }
-  document.getElementById("btn-host-login").addEventListener("click",()=>authenticate(true).catch(()=>alert("Error de conexión.")));
+  document.getElementById("qr-img").src=roomApi("/api/qr.svg");
   async function hostAction(payload) {
     ensureAudio();
     try {
       if (!await authenticate()) return false;
-      const res = await fetch("/api/host/action", {method:"POST",headers:{"Content-Type":"application/json","X-Host-Key":hostKey},body:JSON.stringify(payload)});
+      const res = await fetch(roomApi("/api/host/action"), {method:"POST",headers:{"Content-Type":"application/json","X-Host-Key":hostKey},body:JSON.stringify(payload)});
       const st = await res.json();
       if (!res.ok) {alert(st.error || "Acción rechazada");return false;}
       updateHud(st);return true;
@@ -1290,45 +1287,15 @@
     e.target.textContent = hidden ? "OCULTAR" : "MOSTRAR QR";
   });
 
-  // Modal de Banco de 10 Preguntas
-  const bankModal = document.getElementById("bank-modal");
-  const bankTextarea = document.getElementById("bank-textarea");
-
-  document.getElementById("btn-bank").addEventListener("click", async () => {
-    try {
-      if (!await authenticate()) return;
-      const qRes = await fetch("/api/questions", {headers:{"X-Host-Key":hostKey}});
-      if (qRes.ok) {
-        const qData = await qRes.json();
-        bankTextarea.value = JSON.stringify(qData.questions, null, 2);
-        bankModal.classList.add("open");
-      } else alert("No se pudo abrir el banco.");
-    } catch (_) {alert("Error de conexión.");}
-  });
-
-  document.getElementById("btn-close-bank").addEventListener("click", () => {
-    bankModal.classList.remove("open");
-  });
-
-  document.getElementById("btn-save-bank").addEventListener("click", async () => {
-    try {
-      const parsed = JSON.parse(bankTextarea.value);
-      const arr = Array.isArray(parsed) ? parsed : parsed.questions;
-      if (!Array.isArray(arr)) throw new Error("Formato inválido: se esperaba una lista de 10 preguntas");
-      if (await hostAction({ action: "LOAD_QUESTIONS", questions: arr })) bankModal.classList.remove("open");
-    } catch (err) {
-      alert("Error en JSON: " + err.message);
-    }
-  });
-
   // Inicialización con soporte dual: API de servidor Node.js o bundle estático para Cloudflare Pages
   async function init() {
     try {
+      await authenticate();
       const assetsRes = await fetch("/assets/n64_assets.json");
       n64Assets = await assetsRes.json();
       preloadAssetImages(n64Assets);
 
-      const stateRes = await fetch("/api/state").catch(() => null);
+      const stateRes = await fetch(roomApi("/api/state")).catch(() => null);
       if (stateRes && stateRes.ok) {
         updateHud(await stateRes.json());
       }
@@ -1337,7 +1304,7 @@
     }
 
     async function poll() {
-      try {const r=await fetch("/api/state",{cache:"no-store"});if(r.ok)updateHud(await r.json());} catch(_){}
+      try {const r=await fetch(roomApi("/api/state"),{cache:"no-store"});if(r.ok)updateHud(await r.json());} catch(_){}
       setTimeout(poll,1000);
     }
     poll();
