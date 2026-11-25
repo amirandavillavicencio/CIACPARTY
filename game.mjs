@@ -1,4 +1,4 @@
-const TOTAL_QUESTIONS = 15;
+const TOTAL_QUESTIONS = 10;
 const DEFAULT_TIMER_SECONDS = 20;
 const CHARACTER_ROSTER = [
   { id: "mario", label: "MARIO", mushroomTex: "32mt001_DEF", color: "#D91C1C" },
@@ -11,7 +11,7 @@ const CHARACTER_ROSTER = [
 
 
 export function initialState() {
-  return {phase:"LOBBY", currentQuestionIndex:0, totalQuestions:15, questions:[], teams:[], lastEventBanner:"SALA DE ESPERA — ESCANEA EL CÓDIGO QR CON TU TELÉFONO", roundSeq:1, sfxCue:"NONE", sfxSeq:0, timerDurationSec:20, timerEndsAt:null};
+  return {phase:"LOBBY", currentQuestionIndex:0, totalQuestions:TOTAL_QUESTIONS, questions:[], teams:[], lastEventBanner:"SALA DE ESPERA — ESCANEA EL CÓDIGO QR CON TU TELÉFONO", roundSeq:1, sfxCue:"NONE", sfxSeq:0, timerDurationSec:20, timerEndsAt:null};
 }
 function emitSfx(gameState, cue) { gameState.sfxCue=cue; gameState.sfxSeq++; }
 function getRemainingSeconds(gameState) {
@@ -164,12 +164,12 @@ function evaluateCurrentQuestion(gameState) {
 
 const keys = ["A","B","C","D"];
 function normalizeQuestions(input) {
-  if (!Array.isArray(input) || input.length !== 15) throw new Error("Se requieren exactamente 15 preguntas.");
+  if (!Array.isArray(input) || input.length !== TOTAL_QUESTIONS) throw new Error("Se requieren exactamente 10 preguntas.");
   return input.map((q,i) => {
     if (!q || typeof q.prompt !== "string" || !q.prompt.trim() || q.prompt.length>500 || /PENDIENTE DE BANCO OFICIAL|ESPACIO PARA PREGUNTA/i.test(q.prompt) || !Array.isArray(q.options) || q.options.length!==4 || !keys.includes(q.correctOption)) throw new Error(`Pregunta ${i+1} incompleta o inválida.`);
     const options=q.options.map((o,j)=>{ const label=typeof o==="string"?o:o?.label; if(typeof label!=="string"||!label.trim()||label.length>250||/^OPCIÓN [ABCD]$/i.test(label.trim())) throw new Error(`Alternativa ${keys[j]} de la pregunta ${i+1} inválida.`); return {key:keys[j],label:label.trim()}; });
     if(new Set(options.map(o=>o.label.toLocaleLowerCase())).size!==4) throw new Error(`Alternativas repetidas en pregunta ${i+1}.`);
-    return {number:i+1,code:`PREGUNTA ${String(i+1).padStart(2,"0")} / 15`,prompt:q.prompt.trim(),options,correctOption:q.correctOption};
+    return {number:i+1,code:`PREGUNTA ${String(i+1).padStart(2,"0")} / ${TOTAL_QUESTIONS}`,prompt:q.prompt.trim(),options,correctOption:q.correctOption};
   });
 }
 const fail=(status,error)=>({status,data:{error},changed:false});
@@ -181,28 +181,29 @@ async function authorized(secret, supplied) {
   let d=0; for(let i=0;i<a.length;i++)d|=a[i]^b[i]; return d===0;
 }
 export async function handleGame(state, {method, path, origin, auth, body={}}, secret) {
+  if(state.phase==="LOBBY"&&state.questions.length===0)state.totalQuestions=TOTAL_QUESTIONS;
   const pub=()=>getPublicState(state,origin);
   if(method==="GET" && path==="/api/state")return ok(pub());
   if(path==="/api/questions"||path==="/api/host/action"||path==="/api/host/check") {
     if(!await authorized(secret,auth))return fail(401,"ACCESO EXCLUSIVO DEL ANFITRIÓN");
     if(method==="GET"&&path==="/api/host/check")return ok({ok:true});
-    if(method==="GET"&&path==="/api/questions")return ok({totalQuestions:15,questions:state.questions});
+    if(method==="GET"&&path==="/api/questions")return ok({totalQuestions:TOTAL_QUESTIONS,questions:state.questions});
     if(method!=="POST"||path!=="/api/host/action")return fail(405,"Método no permitido");
     const action=body.action;
     if(action==="LOAD_QUESTIONS") {
       if(state.phase!=="LOBBY")return fail(409,"Edita el banco en la sala de espera.");
-      try {state.questions=normalizeQuestions(body.questions);} catch(e){return fail(400,e.message);}
-      state.lastEventBanner="BANCO DE 15 PREGUNTAS CARGADO";
+      try {state.questions=normalizeQuestions(body.questions);state.totalQuestions=TOTAL_QUESTIONS;} catch(e){return fail(400,e.message);}
+      state.lastEventBanner="BANCO DE 10 PREGUNTAS CARGADO";
     } else if(action==="START_GAME") {
-      if(state.phase!=="LOBBY"||state.questions.length!==15||!state.teams.length)return fail(409,"Se necesitan 15 preguntas, equipos y estar en la sala de espera.");
+      if(state.phase!=="LOBBY"||state.questions.length!==TOTAL_QUESTIONS||!state.teams.length)return fail(409,"Se necesitan 10 preguntas, equipos y estar en la sala de espera.");
       startQuestionRound(state,0);
     } else if(action==="REVEAL_AND_MOVE") {
       if(state.phase!=="QUESTION_OPEN")return fail(409,"No hay una pregunta abierta.");
       evaluateCurrentQuestion(state);
     } else if(action==="NEXT_QUESTION") {
       if(state.phase!=="QUESTION_REVEALED")return fail(409,"Evalúa primero la pregunta actual.");
-      if(state.currentQuestionIndex<14)startQuestionRound(state,state.currentQuestionIndex+1);
-      else {state.phase="FINISHED";state.timerEndsAt=null;state.roundSeq++;emitSfx(state,"FANFARE");state.lastEventBanner="¡FIN DE LAS 15 PREGUNTAS!";}
+      if(state.currentQuestionIndex<TOTAL_QUESTIONS-1)startQuestionRound(state,state.currentQuestionIndex+1);
+      else {state.phase="FINISHED";state.timerEndsAt=null;state.roundSeq++;emitSfx(state,"FANFARE");state.lastEventBanner="¡FIN DE LAS 10 PREGUNTAS!";}
     } else if(action==="RESET_HEIGHTS"||action==="CLEAR_TEAMS") {
       if(action==="CLEAR_TEAMS")state.teams=[];
       for(const t of state.teams)Object.assign(t,{height:0,correctCount:0,wrongCount:0,streak:0,currentAnswer:null,answeredAt:null,lastDelta:0});
@@ -224,7 +225,7 @@ export async function handleGame(state, {method, path, origin, auth, body={}}, s
     const free=CHARACTER_ROSTER.filter(c=>!state.teams.some(t=>t.characterId===c.id));
     const c=free.find(c=>c.id===body.characterId)||free[0];
     team={id:crypto.randomUUID(),token:crypto.randomUUID(),name,characterId:c.id,characterLabel:c.label,color:c.color,mushroomTex:c.mushroomTex,height:0,correctCount:0,wrongCount:0,streak:0,currentAnswer:null,answeredAt:null,lastDelta:0};
-    state.teams.push(team);emitSfx(state,"ANSWER");state.lastEventBanner=`¡${name} (${c.label}) SUBIÓ A SU HONGO!`;
+    state.teams.push(team);emitSfx(state,"ANSWER");state.lastEventBanner=`¡${name} (${c.label}) SUBIÓ A SU PLATAFORMA!`;
     return ok({team:{id:team.id,name,characterId:team.characterId,token:team.token},state:pub()},true);
   }
   if(method==="POST"&&path==="/api/answer") {
