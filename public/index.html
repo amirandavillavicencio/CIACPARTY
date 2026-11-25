@@ -11,7 +11,7 @@
     <!-- Escenario 3D Nintendo 64 con modelos HBINMODE y texturas CI4 originales de Mario Party (USA).z64 -->
     <canvas id="n64-canvas"></canvas>
 
-    <!-- HUD Superior: Identidad + Tablero de Pregunta (15 preguntas) + Escalímetro de Alturas -->
+    <!-- HUD Superior: Identidad + Tablero de Pregunta (10 preguntas) + Escalímetro de Alturas -->
     <div id="hud-top">
       <div id="brand-panel" class="n64-box">
         <h1 class="n64-title">MUSHROOM PARTY CIAC</h1>
@@ -22,8 +22,8 @@
           </button>
         </div>
         <div class="rules-list n64-text-outline">
-          • ACIERTO: HONGO SUBE (+1m)<br/>
-          • ERROR: HONGO BAJA (-1m)<br/>
+          • ACIERTO: PLATAFORMA SUBE (+1m)<br/>
+          • ERROR: PLATAFORMA BAJA (-1m)<br/>
           • NINGÚN EQUIPO ES ELIMINADO<br/>
           • GANA LA MAYOR ALTURA (15 PREG.)
         </div>
@@ -36,8 +36,8 @@
 
       <div id="question-hud" class="n64-box-wood">
         <div id="question-header-row">
-          <span id="question-counter" class="n64-text-outline">PREGUNTA 01 / 15</span>
-          <div id="progress-blocks" title="Progreso de las 15 preguntas"></div>
+          <span id="question-counter" class="n64-text-outline">PREGUNTA 01 / 10</span>
+          <div id="progress-blocks" title="Progreso de las 10 preguntas"></div>
           <div id="timer-box" title="Cuenta regresiva">
             <span>TIEMPO:</span>
             <span id="timer-seconds">--s</span>
@@ -71,7 +71,7 @@
 
       <div id="leaderboard-panel" class="n64-box">
         <div class="lb-header">
-          <h2 class="n64-text-outline">ALTURA DE HONGOS</h2>
+          <h2 class="n64-text-outline">ALTURA DE PLATAFORMAS</h2>
           <span id="answered-counter">0/0 LISTOS</span>
         </div>
         <ul id="leaderboard-list">
@@ -91,9 +91,9 @@
       </div>
     </div>
 
-    <!-- Podio Final N64 al terminar las 15 preguntas -->
+    <!-- Podio Final N64 al terminar las 10 preguntas -->
     <div id="podium-overlay" class="n64-box">
-      <h2 class="n64-title" style="font-size:26px;">¡PODIO FINAL — 15 PREGUNTAS!</h2>
+      <h2 class="n64-title" style="font-size:26px;">¡PODIO FINAL — 10 PREGUNTAS!</h2>
       <p id="podium-winner-text" class="n64-text-outline" style="font-size:16px; color:#50F850; margin-top:4px;">
         GANADOR A MAYOR ALTURA
       </p>
@@ -127,10 +127,10 @@
       </div>
       <div id="host-controls">
         <button id="btn-host-login" class="n64-btn n64-btn-gray">ANFITRIÓN</button>
-        <button id="btn-start" class="n64-btn n64-btn-green">INICIAR (1/15)</button>
-        <button id="btn-reveal" class="n64-btn n64-btn-yellow">EVALUAR Y MOVER HONGOS</button>
+        <button id="btn-start" class="n64-btn n64-btn-green">INICIAR (1/10)</button>
+        <button id="btn-reveal" class="n64-btn n64-btn-yellow">EVALUAR Y MOVER PLATAFORMAS</button>
         <button id="btn-next" class="n64-btn n64-btn-blue">SIGUIENTE ▶</button>
-        <button id="btn-bank" class="n64-btn n64-btn-gray" title="Cargar o editar el banco oficial de 15 preguntas">
+        <button id="btn-bank" class="n64-btn n64-btn-gray" title="Cargar o editar el banco oficial de 10 preguntas">
           BANCO 15 PREG.
         </button>
         <button id="btn-reset" class="n64-btn" title="Reiniciar alturas a 0m">
@@ -140,19 +140,19 @@
     </div>
   </div>
 
-  <!-- Modal para cargar el Banco Oficial de 15 Preguntas -->
+  <!-- Modal para cargar el Banco Oficial de 10 Preguntas -->
   <div id="bank-modal">
     <div id="bank-dialog" class="n64-box">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 class="n64-title" style="font-size:18px;">BANCO DE 15 PREGUNTAS (FORMATO JSON)</h2>
+        <h2 class="n64-title" style="font-size:18px;">BANCO DE 10 PREGUNTAS (FORMATO JSON)</h2>
         <button id="btn-close-bank" class="n64-btn">CERRAR [X]</button>
       </div>
       <p style="font-size:12px; color:#FFF8DC;">
-        Pega o edita aquí las 15 preguntas oficiales cuando sean entregadas. No contiene preguntas ni datos institucionales inventados.
+        Pega o edita aquí las 10 preguntas oficiales cuando sean entregadas. No contiene preguntas ni datos institucionales inventados.
       </p>
       <textarea id="bank-textarea" spellcheck="false"></textarea>
       <div style="display:flex; justify-content:flex-end; gap:10px;">
-        <button id="btn-save-bank" class="n64-btn n64-btn-green">GUARDAR 15 PREGUNTAS</button>
+        <button id="btn-save-bank" class="n64-btn n64-btn-green">GUARDAR 10 PREGUNTAS</button>
       </div>
     </div>
   </div>
