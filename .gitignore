@@ -1,0 +1,12 @@
+node_modules/
+.wrangler/
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+*.z64
+*.n64
+*.v64
+*.sqlite
+*.sqlite3
+tools/
