@@ -1247,6 +1247,7 @@
     return sessionReady;
   }
   document.getElementById("qr-img").src=roomApi("/api/qr.svg");
+  document.querySelector('a[href="/play"]').href=roomApi("/play");
   async function hostAction(payload) {
     ensureAudio();
     try {
