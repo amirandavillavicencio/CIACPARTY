@@ -25,7 +25,7 @@
           • ACIERTO: PLATAFORMA SUBE (+1m)<br/>
           • ERROR: PLATAFORMA BAJA (-1m)<br/>
           • NINGÚN EQUIPO ES ELIMINADO<br/>
-          • GANA LA MAYOR ALTURA (15 PREG.)
+          • GANA LA MAYOR ALTURA (10 PREG.)
         </div>
         <div style="margin-top:6px; display:flex; gap:4px;">
           <button id="btn-cam-mode" class="n64-btn n64-btn-gray" style="font-size:10px; padding:3px 6px; width:100%;">
@@ -107,7 +107,7 @@
     <div id="qr-panel" class="n64-box">
       <h3 class="n64-text-outline">CONECTA TU EQUIPO (QR)</h3>
       <div id="qr-box">
-        <img id="qr-img" src="/api/qr.svg" alt="Código QR para equipos" />
+        <img id="qr-img"  alt="Código QR para equipos" />
       </div>
       <div id="join-url-text">CARGANDO DIRECCIÓN...</div>
       <div style="margin-top:6px; display:flex; gap:5px; justify-content:center;">
@@ -126,13 +126,9 @@
         SALA DE ESPERA — ESCANEA EL CÓDIGO QR CON TU TELÉFONO
       </div>
       <div id="host-controls">
-        <button id="btn-host-login" class="n64-btn n64-btn-gray">ANFITRIÓN</button>
         <button id="btn-start" class="n64-btn n64-btn-green">INICIAR (1/10)</button>
         <button id="btn-reveal" class="n64-btn n64-btn-yellow">EVALUAR Y MOVER PLATAFORMAS</button>
         <button id="btn-next" class="n64-btn n64-btn-blue">SIGUIENTE ▶</button>
-        <button id="btn-bank" class="n64-btn n64-btn-gray" title="Cargar o editar el banco oficial de 10 preguntas">
-          BANCO 15 PREG.
-        </button>
         <button id="btn-reset" class="n64-btn" title="Reiniciar alturas a 0m">
           REINICIAR
         </button>
@@ -140,31 +136,6 @@
     </div>
   </div>
 
-  <!-- Modal para cargar el Banco Oficial de 10 Preguntas -->
-  <div id="bank-modal">
-    <div id="bank-dialog" class="n64-box">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 class="n64-title" style="font-size:18px;">BANCO DE 10 PREGUNTAS (FORMATO JSON)</h2>
-        <button id="btn-close-bank" class="n64-btn">CERRAR [X]</button>
-      </div>
-      <p style="font-size:12px; color:#FFF8DC;">
-        Pega o edita aquí las 10 preguntas oficiales cuando sean entregadas. No contiene preguntas ni datos institucionales inventados.
-      </p>
-      <textarea id="bank-textarea" spellcheck="false"></textarea>
-      <div style="display:flex; justify-content:flex-end; gap:10px;">
-        <button id="btn-save-bank" class="n64-btn n64-btn-green">GUARDAR 10 PREGUNTAS</button>
-      </div>
-    </div>
-  </div>
-
-  <dialog id="host-login-dialog" class="n64-box" style="max-width:90vw;color:#fff;background:#12305c;">
-    <form method="dialog">
-      <label for="host-password">Clave del anfitrión</label>
-      <input id="host-password" type="password" autocomplete="current-password" required style="display:block;margin:10px 0;" />
-      <button value="ok" class="n64-btn n64-btn-green">ENTRAR</button>
-      <button value="cancel" formnovalidate class="n64-btn">CANCELAR</button>
-    </form>
-  </dialog>
   <script src="/stage.js"></script>
 </body>
 </html>
