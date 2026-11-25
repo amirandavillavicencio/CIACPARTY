@@ -1,0 +1,22 @@
+{
+  "name": "ciacparty-backend",
+  "main": "backend.mjs",
+  "compatibility_date": "2026-11-25",
+  "workers_dev": false,
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CIACPARTY_GAME",
+        "class_name": "CiacpartyGame"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "CiacpartyGame"
+      ]
+    }
+  ]
+}
