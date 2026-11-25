@@ -10,8 +10,8 @@ const CHARACTER_ROSTER = [
 ];
 
 
-export function initialState() {
-  return {phase:"LOBBY", currentQuestionIndex:0, totalQuestions:TOTAL_QUESTIONS, questions:[], teams:[], lastEventBanner:"SALA DE ESPERA — ESCANEA EL CÓDIGO QR CON TU TELÉFONO", roundSeq:1, sfxCue:"NONE", sfxSeq:0, timerDurationSec:20, timerEndsAt:null};
+export function initialState(bank = []) {
+  return {phase:"LOBBY", currentQuestionIndex:0, totalQuestions:TOTAL_QUESTIONS, questions:bank.length ? normalizeQuestions(bank) : [], teams:[], lastEventBanner:"SALA DE ESPERA — ESCANEA EL CÓDIGO QR CON TU TELÉFONO", roundSeq:1, sfxCue:"NONE", sfxSeq:0, timerDurationSec:20, timerEndsAt:null};
 }
 function emitSfx(gameState, cue) { gameState.sfxCue=cue; gameState.sfxSeq++; }
 function getRemainingSeconds(gameState) {
